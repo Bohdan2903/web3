@@ -2,6 +2,7 @@
   "name": "web3",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://bohdan2903.github.io/web3",
   "dependencies": {
     "@types/node": "^18.11.18",
     "@types/react": "^18.0.26",
@@ -23,8 +24,10 @@
     "typescript": "^4.9.4"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "npm run build",
     "prettier-lint": "npm run prettier && npm run lint:fix"
   },
   "eslintConfig": {
@@ -43,5 +46,8 @@
       "last 3 firefox version",
       "last 3 safari version"
     ]
+  },
+  "devDependencies": {
+    "gh-pages": "^4.0.0"
   }
 }
