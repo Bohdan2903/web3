@@ -1,9 +1,9 @@
-import React from "react";
-import { ethers } from "ethers";
-import { addressValidate } from "../utils/addressValidate";
-import { useForm } from "react-hook-form";
+import React from 'react'
+import { ethers } from 'ethers'
+import { addressValidate } from '../utils/addressValidate'
+import { useForm } from 'react-hook-form'
 
-export const Login = ({wallet,msg, setMsg, setUser}:any) => {
+export const Login = ({ wallet, msg, setMsg, setUser }: any) => {
   const useFormProps = useForm()
   const { handleSubmit, register } = useFormProps
 
@@ -19,7 +19,7 @@ export const Login = ({wallet,msg, setMsg, setUser}:any) => {
       setMsg('incorrect pass ')
     }
   })
-  return(
+  return (
     <>
       <form onSubmit={connectUser} noValidate>
         <div>

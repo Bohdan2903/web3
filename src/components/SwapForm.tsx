@@ -17,7 +17,7 @@ export const SwapForm = ({ wallet }: any) => {
   useEffect(() => {
     if (wallet.data) {
       onLoad().then(r => r)
-      getSwapPrice().then(r => r)
+      getSwapPrice()
       // setTimeout(() => getSwapPrice(), 5000)
     }
   }, [wallet?.data])
@@ -43,8 +43,8 @@ export const SwapForm = ({ wallet }: any) => {
   }
   console.log(usdcAmount, wethAmount, 'amount')
 
-  const getSwapPrice = (inputAmount = 0) =>
-    getPrice(inputAmount, 0, wallet.address).then((data: any) => {
+  const getSwapPrice = (inputAmount?: any) =>
+    getPrice(inputAmount || 1, 10, wallet.address).then((data: any) => {
       console.log(data, 'data')
       // setTransaction(data[0])
       // setOutputAmount(data[1])

@@ -16,9 +16,8 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react",
-    "baseUrl": "src",
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src", "node_modules/@types/webpack-env/index.d.ts"],
-  "exclude": ["dist", "node_modules", ".vscode"]
+  "exclude": ["dist", "node_modules", ".vscode",  ".idea"]
 }

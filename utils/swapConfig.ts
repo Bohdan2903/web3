@@ -17,12 +17,17 @@ export const getPrice = async (amount: any, slippageAmount = 5, walletAddress: s
     const wei = ethers.utils.parseUnits(amount.toString(), goerliWETH.decimals)
     const currencyAmount = CurrencyAmount.fromRawAmount(TOKEN0, JSBI.BigInt(wei))
 
-    const route: any = await router.route(currencyAmount, TOKEN1, TradeType.EXACT_INPUT, {
-      recipient: walletAddress,
-      slippageTolerance: new Percent(slippageAmount, 100),
-      deadline: Math.floor(Date.now() / 1000 + 1800),
-      type: SwapType.SWAP_ROUTER_02,
-    })
+    const route: any = await router.route(
+      currencyAmount,
+      TOKEN1,
+      TradeType.EXACT_INPUT,
+      {
+        recipient: walletAddress,
+        slippageTolerance: new Percent(slippageAmount, 100),
+        deadline: Math.floor(Date.now() / 1000 + 1800),
+        type: SwapType.SWAP_ROUTER_02,
+      },
+    )
 
     console.log(route, 'route')
     console.log(wei, 'wei')

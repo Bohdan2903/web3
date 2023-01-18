@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import Header from 'components/Header'
+import Header from './components/Header'
 import Balance from './components/Balance'
 import { Login } from './components/Login'
 import { Import } from './components/Import'
@@ -30,7 +30,6 @@ const App = () => {
       }
     }
   }, [])
-
 
   return (
     <div className="App">

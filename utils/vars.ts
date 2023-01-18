@@ -12,6 +12,7 @@ export const CHAIN_ID = 5
 export const InfuraApi = 'https://goerli.infura.io/v3/'
 export const provider = new ethers.providers.InfuraProvider('goerli', 'e811642551144f67a32a24b4442f0c09')
 
+
 export const optionsCrypt = {
   scrypt: {
     N: 1 << 16,
