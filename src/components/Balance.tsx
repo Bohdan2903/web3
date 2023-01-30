@@ -3,7 +3,6 @@ import { getBalance } from '../utils/getBalance'
 
 const Balance = ({ wallet, setWallet }: any) => {
   const { balance, address } = wallet
-  console.log(wallet, 'wallet')
   // @ts-ignore
   useEffect(() => {
     // @ts-ignore
@@ -11,7 +10,6 @@ const Balance = ({ wallet, setWallet }: any) => {
     (async () => {
       if (wallet?.address) {
         const balance: any = await getBalance(address)
-        console.log(balance, 'balance')
         setWallet({
           ...wallet,
           balance,

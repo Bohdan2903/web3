@@ -10,7 +10,6 @@ export const Login = ({ wallet, msg, setMsg, setUser }: any) => {
   const connectUser = handleSubmit(async (data: any) => {
     try {
       const decrypt = await ethers.Wallet.fromEncryptedJsonSync(wallet.data, data.passwordLogin)
-      console.log(decrypt, 'decrypt')
       if (decrypt?.address) {
         setUser({ address: addressValidate(decrypt.address), isLogin: true })
       }

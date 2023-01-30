@@ -1,16 +1,21 @@
 import { ethers } from 'ethers'
-
-//https://rpc.ankr.com/eth_rinkeby
 // Chain ID - 5
 
 // export const TEMP_PRIVATE_KEY_2 = '0xc4bdfb4c376785a2aa7d6e21166354b0ed17e716c59607ce15f23bd0e88508be'
-// export const TEMP_PRIVATE_KEY = '0xd542ea3d2bbf8870e12750795c9615f5ec04d6c4357ac82aaa772aad55601169'
+export const TEMP_PRIVATE_KEY = '0xd542ea3d2bbf8870e12750795c9615f5ec04d6c4357ac82aaa772aad55601169'
 // export const TEMP_SEED = 'gasp captain pencil divorce blame improve couple aim merge magnet permit ice'
-export const SWAP_ADDRESS = '0x6988931d520D3A091F7C61b615CFF743280586cd'
+export const WALLET_ADDRESS = '0x6988931d520D3A091F7C61b615CFF743280586cd'
+export const SWAP_ROUTER_ADDRESS = '0xE592427A0AEce92De3Edee1F18E0157C05861564'
+export const QUOTER_CONTRACT_ADDRESS = '0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6'
+export const UNISWAP_FACTORY_ADDRESS = '0x1F98431c8aD98523631AE4a59f267346ea31F984'
 
 export const CHAIN_ID = 5
-export const InfuraApi = 'https://goerli.infura.io/v3/'
-export const provider = new ethers.providers.InfuraProvider('goerli', 'e811642551144f67a32a24b4442f0c09')
+const infuraId = 'e811642551144f67a32a24b4442f0c09'
+// export const InfuraApi = `https://goerli.infura.io/v3/${infuraId}`
+
+export const provider = new ethers.providers.InfuraProvider(CHAIN_ID, infuraId)
+
+export const Signer = new ethers.Wallet(TEMP_PRIVATE_KEY, provider)
 
 export const optionsCrypt = {
   scrypt: {
@@ -20,7 +25,7 @@ export const optionsCrypt = {
 
 export const goerliWETH = {
   name: 'Wrapped Ether',
-  address: '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
+  address: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
   symbol: 'WETH',
   decimals: 18,
   chainId: 5,
@@ -29,12 +34,15 @@ export const goerliWETH = {
 }
 export const goerliUSDC = {
   name: 'USD Coin USDC',
-  address: '0x3a034fe373b6304f98b7a24a3f21c958946d4075',
+  address: '0x07865c6e87b9f70255377e024ace6630c1eaa37f',
   symbol: 'USDC',
   decimals: 6,
   chainId: 5,
   logoURI: 'https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_USDC.svg',
 }
+
+
+// ABI's
 
 export const ERC20ABI = [
   {
@@ -308,3 +316,17 @@ export const ERC20ABI = [
     type: 'event',
   },
 ]
+
+export const WETH_ABI = [
+  // Wrap ETH
+  'function deposit() payable',
+
+  // Unwrap ETH
+  'function withdraw(uint wad) public',
+]
+
+// Transactions
+
+export const MAX_FEE_PER_GAS = 100000000000
+export const MAX_PRIORITY_FEE_PER_GAS = 100000000000
+export const TOKEN_AMOUNT_TO_APPROVE_FOR_TRANSFER = 2000

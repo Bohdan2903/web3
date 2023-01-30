@@ -17,9 +17,8 @@ export const CreatePass = ({ loginData, msg, setMsg, setWallet, setUser }: any) 
       wallet = loginData.privateKey
         ? await new ethers.Wallet(loginData.privateKey)
         : await ethers.Wallet.fromMnemonic(loginData.seedPhrase)
-      encrypt = await wallet.encrypt(data.password, optionsCrypt).then(json => (dataEncrypted = json))
+      await wallet.encrypt(data.password, optionsCrypt).then(json => (dataEncrypted = json))
 
-      console.log(dataEncrypted, 'dataEncrypted')
       setWallet({
         ...wallet,
         balance: null,

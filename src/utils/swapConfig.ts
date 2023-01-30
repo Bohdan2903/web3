@@ -1,54 +1,103 @@
-import { CHAIN_ID, provider, goerliWETH, goerliUSDC, SWAP_ADDRESS, ERC20ABI } from './vars'
-import { AlphaRouter, SwapType } from '@uniswap/smart-order-router'
+import {
+  ERC20ABI,
+  goerliUSDC,
+  goerliWETH,
+  MAX_FEE_PER_GAS,
+  MAX_PRIORITY_FEE_PER_GAS,
+  Signer,
+  SWAP_ROUTER_ADDRESS,
+  WALLET_ADDRESS,
+} from './vars'
 
-const { Token, CurrencyAmount, TradeType, Percent } = require('@uniswap/sdk-core')
-const { ethers, BigNumber } = require('ethers')
-const JSBI = require('jsbi')
+const { ethers } = require('ethers')
+import { Currency, CurrencyAmount, Percent, Token, TradeType } from '@uniswap/sdk-core'
+import { FeeAmount, Pool, Route, SwapOptions, SwapRouter, Trade } from '@uniswap/v3-sdk'
+import JSBI from 'jsbi'
 
-export const getWethContract = () => new ethers.Contract(goerliWETH.address, ERC20ABI, provider)
-export const getUSDCContract = () => new ethers.Contract(goerliUSDC.address, ERC20ABI, provider)
-export const TOKEN0 = new Token(CHAIN_ID, goerliWETH.address, goerliWETH.decimals, goerliWETH.symbol, goerliWETH.name)
-export const TOKEN1 = new Token(CHAIN_ID, goerliUSDC.address, goerliUSDC.decimals, goerliUSDC.symbol, goerliUSDC.name)
+import { getPoolInfo } from './pool'
+import { getOutputQuote, getTokenTransferApproval, sendTransactionViaWallet } from './transactionsHelpers'
 
-const router = new AlphaRouter({ chainId: CHAIN_ID, provider })
+const slippageTolerance: any = new Percent('500', '10000') // 50 bips, or 0.50% - Slippage tolerance
 
-export const getPrice = async (amount: any, slippageAmount = 5, walletAddress: string) => {
+const deadline = Math.floor(Date.now() / 1000 + 1800)
+
+export const getContract = async (tokenAddress: string) => {
+  return new ethers.Contract(tokenAddress, ERC20ABI, Signer)
+}
+
+export const getPrice = async (
+  amount = 1,
+  walletAddress: string,
+  token0: any = goerliWETH,
+  token1: any = goerliUSDC
+) => {
   try {
-    const wei = ethers.utils.parseUnits(amount.toString(), goerliWETH.decimals)
-    const currencyAmount = CurrencyAmount.fromRawAmount(TOKEN0, JSBI.BigInt(wei))
+    const TOKEN0: Currency = new Token(token0.chainId, token0.address, token0.decimals, token0.symbol, token0.name)
+    const TOKEN1: Currency = new Token(token1.chainId, token1.address, token1.decimals, token1.symbol, token1.name)
+    const poolData = await getPoolInfo(TOKEN0, TOKEN1)
 
-    const route: any = await router.route(currencyAmount, TOKEN1, TradeType.EXACT_INPUT, {
-      recipient: walletAddress,
-      slippageTolerance: new Percent(slippageAmount, 100),
-      deadline: Math.floor(Date.now() / 1000 + 1800),
-      type: SwapType.SWAP_ROUTER_02,
+    const pool = new Pool(
+      TOKEN0,
+      TOKEN1,
+      FeeAmount.MEDIUM,
+      poolData.sqrtPriceX96.toString(),
+      poolData.liquidity.toString(),
+      poolData.tick
+    )
+
+    const swapRoute = new Route([pool], TOKEN0, TOKEN1)
+    const amountOut = await getOutputQuote(swapRoute, token0, amount)
+
+    const uncheckedTrade = Trade.createUncheckedTrade({
+      route: swapRoute,
+      inputAmount: CurrencyAmount.fromRawAmount(
+        TOKEN0,
+        ethers.utils.parseUnits(amount.toString(), token0.decimals).toString()
+      ),
+      outputAmount: CurrencyAmount.fromRawAmount(TOKEN1, JSBI.BigInt(amountOut)),
+      tradeType: TradeType.EXACT_INPUT,
     })
-
-    console.log(route, 'route')
-    console.log(wei, 'wei')
-    console.log(currencyAmount, 'currencyAmount')
-
-    const transaction = {
-      data: route.methodParameters.calldata,
-      to: walletAddress,
-      value: BigNumber.from(route.methodParameters.value),
-      from: walletAddress,
-      gasPrice: BigNumber.from(route.gasPriceWei),
-      gasLimit: ethers.utils.hexlify(1000000),
-    }
-
-    const quoteAmountOut = route.quote.toFixed(6)
-    const ratio = (amount / quoteAmountOut).toFixed(3)
-    return [transaction, quoteAmountOut, ratio]
+    const outputPrice = uncheckedTrade.outputAmount.toSignificant(6)
+    const ratio = uncheckedTrade.executionPrice.toSignificant(6)
+    return [uncheckedTrade, outputPrice, ratio]
   } catch (e) {
     console.log(e, 'error')
+    return [0, 0]
   }
 }
 
-export const runSwap = async (transaction: any, signer: { sendTransaction: (arg0: any) => void }) => {
-  const approvalAmount = ethers.utils.parseUnits('10', 18).toString()
-  const contract0 = getWethContract()
-  await contract0.connect(signer).approve(SWAP_ADDRESS, approvalAmount)
+export const runSwap = async (token0: any, tokenContract: any, amount: number, trade: any) => {
+  try {
+    // Give approval to the router to spend the token
+    const tokenApproval = await getTokenTransferApproval(token0, tokenContract, amount)
+    console.log(tokenApproval, 'approve')
+    const options: SwapOptions = {
+      slippageTolerance,
+      deadline,
+      recipient: WALLET_ADDRESS,
+    }
+    const methodParameters = SwapRouter.swapCallParameters([trade], options)
+    console.log(methodParameters, 'methodParameters')
 
-  signer.sendTransaction(transaction)
+    const tx = {
+      data: methodParameters.calldata,
+      to: SWAP_ROUTER_ADDRESS,
+      value: methodParameters.value,
+      from: WALLET_ADDRESS,
+      gasLimit: ethers.utils.hexlify(100000),
+      maxFeePerGas: MAX_FEE_PER_GAS,
+      maxPriorityFeePerGas: MAX_PRIORITY_FEE_PER_GAS,
+    }
+
+    if (tokenApproval == 'Success') {
+      const res = await sendTransactionViaWallet(tx)
+      console.log(res, 'res')
+
+      return res
+    } else {
+      return 'error'
+    }
+  } catch (e) {
+    console.log(e, 'error')
+  }
 }

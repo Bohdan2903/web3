@@ -5,17 +5,12 @@ import { Login } from './components/Login'
 import { Import } from './components/Import'
 import { CreatePass } from './components/CreatePass'
 import { SwapForm } from './components/SwapForm'
-
 import './App.css'
-import { provider } from './utils/vars'
-import { ethers } from 'ethers'
 
 const App = () => {
   const [msg, setMsg] = useState('')
   const [wallet, setWallet] = useState<any>(null)
   const [user, setUser] = useState<any>(null)
-  // const [signer, setSigner] = useState<any>(null)
-  const [provider, setProvider] = useState<any>(null)
   const [loginData, setLoginData] = useState<any>(null)
 
   useEffect(() => {
