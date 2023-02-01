@@ -4,7 +4,6 @@ import {
   goerliWETH,
   MAX_FEE_PER_GAS,
   MAX_PRIORITY_FEE_PER_GAS,
-  Signer,
   SWAP_ROUTER_ADDRESS,
   WALLET_ADDRESS,
 } from './vars'
@@ -21,20 +20,21 @@ const slippageTolerance: any = new Percent('500', '10000') // 50 bips, or 0.50% 
 
 const deadline = Math.floor(Date.now() / 1000 + 1800)
 
-export const getContract = async (tokenAddress: string) => {
-  return new ethers.Contract(tokenAddress, ERC20ABI, Signer)
+export const getContract = async (tokenAddress: string, signer: any) => {
+  return new ethers.Contract(tokenAddress, ERC20ABI, signer)
 }
 
 export const getPrice = async (
   amount = 1,
   walletAddress: string,
   token0: any = goerliWETH,
-  token1: any = goerliUSDC
+  token1: any = goerliUSDC,
+  signer: any
 ) => {
   try {
     const TOKEN0: Currency = new Token(token0.chainId, token0.address, token0.decimals, token0.symbol, token0.name)
     const TOKEN1: Currency = new Token(token1.chainId, token1.address, token1.decimals, token1.symbol, token1.name)
-    const poolData = await getPoolInfo(TOKEN0, TOKEN1)
+    const poolData = await getPoolInfo(TOKEN0, TOKEN1, signer)
 
     const pool = new Pool(
       TOKEN0,
@@ -66,10 +66,10 @@ export const getPrice = async (
   }
 }
 
-export const runSwap = async (token0: any, tokenContract: any, amount: number, trade: any) => {
+export const runSwap = async (token0: any, tokenContract: any, amount: number, trade: any, signer: any) => {
   try {
     // Give approval to the router to spend the token
-    const tokenApproval = await getTokenTransferApproval(token0, tokenContract, amount)
+    const tokenApproval = await getTokenTransferApproval(token0, tokenContract, amount, signer)
     console.log(tokenApproval, 'approve')
     const options: SwapOptions = {
       slippageTolerance,
@@ -90,7 +90,7 @@ export const runSwap = async (token0: any, tokenContract: any, amount: number, t
     }
 
     if (tokenApproval == 'Success') {
-      const res = await sendTransactionViaWallet(tx)
+      const res = await sendTransactionViaWallet(tx, signer)
       console.log(res, 'res')
 
       return res

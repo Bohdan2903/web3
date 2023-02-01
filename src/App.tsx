@@ -11,6 +11,7 @@ const App = () => {
   const [msg, setMsg] = useState('')
   const [wallet, setWallet] = useState<any>(null)
   const [user, setUser] = useState<any>(null)
+  const [signer, setSigner] = useState<any>(null)
   const [loginData, setLoginData] = useState<any>(null)
 
   useEffect(() => {
@@ -34,13 +35,15 @@ const App = () => {
           {!user && wallet && (
             <CreatePass msg={msg} setMsg={setMsg} setWallet={setWallet} loginData={loginData} setUser={setUser} />
           )}
-          {user && !user.isLogin && wallet && <Login wallet={wallet} msg={msg} setMsg={setMsg} setUser={setUser} />}
+          {user && !user.isLogin && wallet && (
+            <Login wallet={wallet} setSigner={setSigner} msg={msg} setMsg={setMsg} setUser={setUser} />
+          )}
 
-          {wallet && user?.isLogin && (
+          {signer && user?.isLogin && (
             <>
               <div>Address: {wallet.address}</div>
-              <Balance wallet={wallet} setWallet={setWallet} />
-              <SwapForm wallet={wallet} />
+              <Balance wallet={wallet} signer={signer} setWallet={setWallet} />
+              <SwapForm wallet={wallet} signer={signer} />
             </>
           )}
 

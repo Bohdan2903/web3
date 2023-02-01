@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { getBalance } from '../utils/getBalance'
 
-const Balance = ({ wallet, setWallet }: any) => {
+const Balance = ({ wallet, setWallet, signer }: any) => {
   const { balance, address } = wallet
   // @ts-ignore
   useEffect(() => {
@@ -9,7 +9,7 @@ const Balance = ({ wallet, setWallet }: any) => {
     // prettier-ignore
     (async () => {
       if (wallet?.address) {
-        const balance: any = await getBalance(address)
+        const balance: any = await getBalance(signer,address)
         setWallet({
           ...wallet,
           balance,

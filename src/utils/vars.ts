@@ -15,8 +15,6 @@ const infuraId = 'e811642551144f67a32a24b4442f0c09'
 
 export const provider = new ethers.providers.InfuraProvider(CHAIN_ID, infuraId)
 
-export const Signer = new ethers.Wallet(TEMP_PRIVATE_KEY, provider)
-
 export const optionsCrypt = {
   scrypt: {
     N: 1 << 16,
@@ -40,7 +38,6 @@ export const goerliUSDC = {
   chainId: 5,
   logoURI: 'https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_USDC.svg',
 }
-
 
 // ABI's
 

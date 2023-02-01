@@ -12,7 +12,7 @@ export const CreatePass = ({ loginData, msg, setMsg, setWallet, setUser }: any) 
       setWallet(null)
       localStorage.removeItem('wallets')
     }
-    let wallet, encrypt, dataEncrypted
+    let wallet, dataEncrypted
     try {
       wallet = loginData.privateKey
         ? await new ethers.Wallet(loginData.privateKey)

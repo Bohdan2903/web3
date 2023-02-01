@@ -1,14 +1,17 @@
 import { BigNumber, ethers } from 'ethers'
-import { provider, QUOTER_CONTRACT_ADDRESS, Signer, SWAP_ROUTER_ADDRESS, WALLET_ADDRESS } from './vars'
+import { provider, QUOTER_CONTRACT_ADDRESS, SWAP_ROUTER_ADDRESS, WALLET_ADDRESS } from './vars'
 import { Currency, CurrencyAmount, Token, TradeType } from '@uniswap/sdk-core'
 import { Route, SwapQuoter } from '@uniswap/v3-sdk'
 
-export const sendTransactionViaWallet = async (transaction: ethers.providers.TransactionRequest): Promise<any> => {
+export const sendTransactionViaWallet = async (
+  transaction: ethers.providers.TransactionRequest,
+  signer: any
+): Promise<any> => {
   if (transaction.value) {
     transaction.value = BigNumber.from(transaction.value)
   }
   try {
-    const txRes = await Signer.sendTransaction(transaction)
+    const txRes = await signer.sendTransaction(transaction)
     return await txRes.wait().then(async () => {
       try {
         const res = await provider.getTransactionReceipt(txRes.hash)
@@ -24,8 +27,8 @@ export const sendTransactionViaWallet = async (transaction: ethers.providers.Tra
     return null
   }
 }
-export const getTokenTransferApproval = async (token0: Token, tokenContract: any, amount: number): Promise<any> => {
-  if (!Signer) {
+export const getTokenTransferApproval = async (token0: Token, tokenContract: any, amount: number, signer:any): Promise<any> => {
+  if (!signer) {
     console.log('No Provider Found')
     return false
   }
@@ -38,7 +41,7 @@ export const getTokenTransferApproval = async (token0: Token, tokenContract: any
     const receipt = await sendTransactionViaWallet({
       ...transaction,
       from: WALLET_ADDRESS,
-    })
+    }, signer)
     if (receipt) {
       return 'Success'
     }

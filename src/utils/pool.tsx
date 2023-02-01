@@ -3,7 +3,7 @@ import { computePoolAddress, FeeAmount } from '@uniswap/v3-sdk'
 
 import { ethers } from 'ethers'
 
-import { Signer, UNISWAP_FACTORY_ADDRESS } from './vars'
+import { UNISWAP_FACTORY_ADDRESS } from './vars'
 
 interface PoolInfo {
   token0: string
@@ -15,7 +15,7 @@ interface PoolInfo {
   tick: number
 }
 
-export const getPoolInfo = async (tokenIn: any, tokenOut: any): Promise<PoolInfo> => {
+export const getPoolInfo = async (tokenIn: any, tokenOut: any, signer:any): Promise<PoolInfo> => {
   const currentPoolAddress = computePoolAddress({
     factoryAddress: UNISWAP_FACTORY_ADDRESS,
     tokenA: tokenIn,
@@ -23,7 +23,7 @@ export const getPoolInfo = async (tokenIn: any, tokenOut: any): Promise<PoolInfo
     fee: FeeAmount.MEDIUM,
   })
 
-  const poolContract = new ethers.Contract(currentPoolAddress, IUniswapV3PoolABI.abi, Signer)
+  const poolContract = new ethers.Contract(currentPoolAddress, IUniswapV3PoolABI.abi, signer)
 
   const [token0, token1, fee, tickSpacing, liquidity, slot0] = await Promise.all([
     poolContract.token0(),

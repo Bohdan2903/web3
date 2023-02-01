@@ -4,7 +4,7 @@ import { getContract, getPrice, runSwap } from '../utils/swapConfig'
 import { BigNumber, ethers } from 'ethers'
 import { goerliWETH, goerliUSDC } from '../utils/vars'
 
-export const SwapForm = ({ wallet }: any) => {
+export const SwapForm = ({ wallet, signer }: any) => {
   const [token0Contact, setToken0Contract] = useState<any>(null)
   const [token1Contact, setToken1Contract] = useState<any>(null)
   const [trade, setTrade] = useState<any>(null)
@@ -25,7 +25,7 @@ export const SwapForm = ({ wallet }: any) => {
     if (wallet?.data && token1 && token0) {
       const interval = setInterval(
         () =>
-          getPrice(1, wallet.address, token0, token1).then((data: any) => {
+          getPrice(1, wallet.address, token0, token1, signer).then((data: any) => {
             setRatio(data[2])
             setTrade(data[0])
           }),
@@ -38,7 +38,7 @@ export const SwapForm = ({ wallet }: any) => {
   }, [token1, token0])
   useEffect(() => {
     if (wallet?.data && token1 && token0) {
-      getPrice(token0amount, wallet.address, token0, token1).then((data: any) => {
+      getPrice(token0amount, wallet.address, token0, token1, signer).then((data: any) => {
         setValue('token1', data[1])
       })
     }
@@ -46,8 +46,8 @@ export const SwapForm = ({ wallet }: any) => {
 
   const onLoad = async () => {
     try {
-      const token0Ctr = await getContract(token0.address)
-      const token1Ctr = await getContract(token1.address)
+      const token0Ctr = await getContract(token0.address, signer)
+      const token1Ctr = await getContract(token1.address, signer)
       if (wallet.data) {
         await getTokenAmount(wallet.address, token0Ctr, token1Ctr)
       }
@@ -74,8 +74,7 @@ export const SwapForm = ({ wallet }: any) => {
 
   const onSubmit = handleSubmit(async () => {
     try {
-      await runSwap(token0, token0Contact,token0amount, trade)
-      // await runSwap1(token0, token1, token0amount, token0Contact)
+      await runSwap(token0, token0Contact, token0amount, trade, signer)
     } catch (e) {
       console.log(e, 'err')
     }
