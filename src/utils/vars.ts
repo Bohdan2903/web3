@@ -1,19 +1,17 @@
 import { ethers } from 'ethers'
 // Chain ID - 5
-
-// export const TEMP_PRIVATE_KEY_2 = '0xc4bdfb4c376785a2aa7d6e21166354b0ed17e716c59607ce15f23bd0e88508be'
-export const TEMP_PRIVATE_KEY = '0xd542ea3d2bbf8870e12750795c9615f5ec04d6c4357ac82aaa772aad55601169'
+export const TEMP_PRIVATE_KEY = '0x31b3f69ef67b9b5c593dedaea86d2fb3ae9da9a3d4753b345168f7067bcc87dd'
 // export const TEMP_SEED = 'gasp captain pencil divorce blame improve couple aim merge magnet permit ice'
-export const WALLET_ADDRESS = '0x6988931d520D3A091F7C61b615CFF743280586cd'
+export const WALLET_ADDRESS = '0x18A5d2917Ec1A2b3F9a9fbe00585c387F57Ff84A'
 export const SWAP_ROUTER_ADDRESS = '0xE592427A0AEce92De3Edee1F18E0157C05861564'
 export const QUOTER_CONTRACT_ADDRESS = '0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6'
 export const UNISWAP_FACTORY_ADDRESS = '0x1F98431c8aD98523631AE4a59f267346ea31F984'
 
 export const CHAIN_ID = 5
 const infuraId = 'e811642551144f67a32a24b4442f0c09'
-// export const InfuraApi = `https://goerli.infura.io/v3/${infuraId}`
+export const InfuraApi = `https://goerli.infura.io/v3/${infuraId}`
 
-export const provider = new ethers.providers.InfuraProvider(CHAIN_ID, infuraId)
+export const provider = new ethers.providers.JsonRpcProvider(InfuraApi)
 
 export const optionsCrypt = {
   scrypt: {

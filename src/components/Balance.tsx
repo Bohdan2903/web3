@@ -1,27 +1,23 @@
 import React, { useEffect } from 'react'
 import { getBalance } from '../utils/getBalance'
 
-const Balance = ({ wallet, setWallet, signer }: any) => {
-  const { balance, address } = wallet
-  // @ts-ignore
-  useEffect(() => {
-    // @ts-ignore
-    // prettier-ignore
-    (async () => {
-      if (wallet?.address) {
-        const balance: any = await getBalance(signer,address)
-        setWallet({
-          ...wallet,
-          balance,
-        })
-      }
-    })()
-  }, [])
+const Balance = ({ wallet, setWallet }: any) => {
+    useEffect(() => {
+        const getCurrBalance = async () => {
+            const balance: any = await getBalance(wallet.address)
+            setWallet({
+                ...wallet,
+                balance,
+            })
+        }
 
-  return (
-    <div>
-      <p>balance: {balance} ETH</p>
-    </div>
-  )
+        getCurrBalance().then(r => r)
+    }, [])
+
+    return (
+        <div>
+            <p>balance: {Number(wallet?.balance).toFixed(6) || 0} ETH</p>
+        </div>
+    )
 }
 export default Balance

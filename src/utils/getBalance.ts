@@ -1,7 +1,8 @@
 import { ethers } from 'ethers'
+import { provider } from "./vars";
 
-export const getBalance = (signer: any, address: string) => {
-  return signer.getBalance(address).then((balanceRes: ethers.BigNumberish) => {
-    return ethers.utils.formatUnits(balanceRes, 18) || 0
-  })
+export const getBalance = async (address: string) => {
+    return provider.getBalance(address).then((balanceRes: ethers.BigNumberish) => {
+        return ethers.utils.formatEther(balanceRes)
+    })
 }

@@ -3,7 +3,7 @@ import {
   goerliUSDC,
   goerliWETH,
   MAX_FEE_PER_GAS,
-  MAX_PRIORITY_FEE_PER_GAS,
+  MAX_PRIORITY_FEE_PER_GAS, provider,
   SWAP_ROUTER_ADDRESS,
   WALLET_ADDRESS,
 } from './vars'
@@ -20,8 +20,8 @@ const slippageTolerance: any = new Percent('500', '10000') // 50 bips, or 0.50% 
 
 const deadline = Math.floor(Date.now() / 1000 + 1800)
 
-export const getContract = async (tokenAddress: string, signer: any) => {
-  return new ethers.Contract(tokenAddress, ERC20ABI, signer)
+export const getContract = async (tokenAddress: string) => {
+  return new ethers.Contract(tokenAddress, ERC20ABI, provider)
 }
 
 export const getPrice = async (
@@ -70,14 +70,12 @@ export const runSwap = async (token0: any, tokenContract: any, amount: number, t
   try {
     // Give approval to the router to spend the token
     const tokenApproval = await getTokenTransferApproval(token0, tokenContract, amount, signer)
-    console.log(tokenApproval, 'approve')
     const options: SwapOptions = {
       slippageTolerance,
       deadline,
-      recipient: WALLET_ADDRESS,
+      recipient: signer.address,
     }
     const methodParameters = SwapRouter.swapCallParameters([trade], options)
-    console.log(methodParameters, 'methodParameters')
 
     const tx = {
       data: methodParameters.calldata,
